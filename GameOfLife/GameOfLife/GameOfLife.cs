@@ -13,6 +13,7 @@ namespace GameOfLife
         Int32[,] grid;
         Int32 lengthOfGrid;
         Int32 heightOfGrid;
+        Int32 counterForCellGrowth;
 
 
         public GameOfLife(Int32 lengthOfGrid, Int32 heightOfGrid)
@@ -23,6 +24,21 @@ namespace GameOfLife
 
             SetupDeadCells(lengthOfGrid, heightOfGrid);
             SetupLiveCells(lengthOfGrid, heightOfGrid);
+            counterForCellGrowth = 0;
+        }
+        public void runEcosystem()
+        {
+            while (counterForCellGrowth <= 100)
+            {
+                KillCellWithLessThanTwoLiveNeighbors();
+                SaveCellWithTwoOrThreeLiveNeighbors();
+                KillCellWithMoreThanThreeNeighbors();
+                SaveDeadCellWithThreeLiveNeighbors();
+                counterForCellGrowth++;
+                System.Threading.Thread.Sleep(2000);
+            }
+            
+            
         }
 
         private void SetupLiveCells(Int32 lengthOfGrid, Int32 heightOfGrid)
@@ -32,7 +48,6 @@ namespace GameOfLife
             grid[midX, midY] = AliveCell;
             grid[midX, midY - 1] = AliveCell;
             grid[midX + 1, midY] = AliveCell;
-            grid[midX + 1, midY + 1] = AliveCell;
         }
 
         private void SetupDeadCells(Int32 lengthOfGrid, Int32 heightOfGrid)
@@ -53,7 +68,10 @@ namespace GameOfLife
 
         private void KillCellWithLessThanTwoLiveNeighbors()
         {
-            
+            var locationX = lengthOfGrid / 2;
+            var locationY = heightOfGrid / 2;
+            //counter for cells around it..check 8 cells
+            setDead(locationX, locationY);
         }
 
         private void SaveCellWithTwoOrThreeLiveNeighbors()
@@ -69,6 +87,16 @@ namespace GameOfLife
         private void SaveDeadCellWithThreeLiveNeighbors()
         {
 
+        }
+
+        private void setAlive(Int32 X, Int32 Y)
+        {
+            grid[X, Y] = AliveCell;
+        }
+
+        private void setDead(Int32 X, Int32 Y)
+        {
+            grid[X, Y] = DeadCell;
         }
     }
 }
