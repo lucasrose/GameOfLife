@@ -21,7 +21,7 @@ namespace GameOfLife
 
         public GameOfLife(Int32 lengthOfecosystem, Int32 heightOfecosystem)
         {
-            ecosystem = new Int32 [lengthOfecosystem, heightOfecosystem];
+            ecosystem = new Int32[lengthOfecosystem, heightOfecosystem];
             this.lengthOfecosystem = lengthOfecosystem;
             this.heightOfecosystem = heightOfecosystem;
             midX = lengthOfecosystem / 2;
@@ -50,7 +50,7 @@ namespace GameOfLife
             if (Y < midY + 20)
                 ChangeEcosystem(X, Y + 1);
             if (Y > midY - 20)
-                ChangeEcosystem(X, Y - 1);            
+                ChangeEcosystem(X, Y - 1);
         }
 
         private void SetupLiveCells()
@@ -67,38 +67,44 @@ namespace GameOfLife
             for (var cellX = 0; cellX < lengthOfecosystem; cellX++)
                 for (var cellY = 0; cellY < lengthOfecosystem; cellY++)
                     ecosystem[cellX, cellY] = DeadCell;
-               
+
         }
 
-        public String GetCellValue(Int32 locationX, Int32 locationY)
+        private Int32 GetCellValue(Int32 locationX, Int32 locationY)
         {
-            if (ecosystem[locationX, locationY] == 1)
+            return ecosystem[locationX, locationY];
+        }
+
+        public String GetCellStringValue(Int32 locationX, Int32 locationY)
+        {
+            var value = GetCellValue(locationX, locationY);
+            if (value == LivingCell)
                 return "Alive";
             return "Dead";
         }
 
-        private Int32 GetTheNumberOfCellsAliveAroundCurrentCell(Int32 cellPositionX, Int32 cellPositionY)
+        private Int32 GetTheNumberOfCellsAliveAroundCurrentCell(Int32 X, Int32 Y)
         {
             var count = 0;
-            if (ecosystem[cellPositionX - 1, cellPositionY + 1] == LivingCell)
+            if (GetCellValue(X - 1, Y + 1) == LivingCell)
                 count++;
-            if (ecosystem[cellPositionX - 1, cellPositionY] == LivingCell)
+            if (GetCellValue(X - 1, Y) == LivingCell)
                 count++;
-            if (ecosystem[cellPositionX - 1, cellPositionY - 1] == LivingCell)
+            if (GetCellValue(X - 1, Y - 1) == LivingCell)
                 count++;
-            if (ecosystem[cellPositionX, cellPositionY - 1] == LivingCell)
+            if (GetCellValue(X, Y - 1) == LivingCell)
                 count++;
-            if (ecosystem[cellPositionX + 1, cellPositionY - 1] == LivingCell)
+            if (GetCellValue(X + 1, Y - 1) == LivingCell)
                 count++;
-            if (ecosystem[cellPositionX + 1, cellPositionY] == LivingCell)
+            if (GetCellValue(X + 1, Y) == LivingCell)
                 count++;
-            if (ecosystem[cellPositionX + 1, cellPositionY + 1] == LivingCell)
+            if (GetCellValue(X + 1, Y + 1) == LivingCell)
                 count++;
-            if (ecosystem[cellPositionX, cellPositionY + 1] == LivingCell)
+            if (GetCellValue(X, Y + 1) == LivingCell)
                 count++;
 
             return count;
-            
+
         }
 
         private void SaveOrKillCell(Int32 X, Int32 Y)
@@ -107,30 +113,14 @@ namespace GameOfLife
             if (ecosystem[X, Y] == LivingCell)
             {
                 if (AliveCells < 2)
-                    ecosystem[X, Y] = DeadCell;
+                    setDead(X, Y);
                 else if (AliveCells <= 3)
-                    ecosystem[X, Y] = LivingCell;
+                    setAlive(X, Y);
                 else if (AliveCells > 3)
-                    ecosystem[X, Y] = DeadCell;
+                    setDead(X, Y);
             }
             else if (ecosystem[X, Y] == DeadCell && AliveCells == 3)
-                ecosystem[X, Y] = LivingCell;
-
-        }
-
-        private void SaveCellWithTwoOrThreeLiveNeighbors()
-        {
-
-        }
-
-        private void KillCellWithMoreThanThreeNeighbors()
-        {
-
-        }
-
-        private void SaveDeadCellWithThreeLiveNeighbors()
-        {
-
+                setAlive(X, Y);
         }
 
         private void setAlive(Int32 X, Int32 Y)

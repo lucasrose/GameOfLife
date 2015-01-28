@@ -22,17 +22,17 @@ namespace GameOfLife
         [TestMethod]
         public void TestCellIsAlive()
         {
-            Assert.AreEqual("Alive", Ecosystem.GetCellValue(50, 50));
+            Assert.AreEqual("Alive", Ecosystem.GetCellStringValue(50, 50));
         }
         [TestMethod]
         public void TestCellIsDead()
         {
-            Assert.AreEqual("Dead", Ecosystem.GetCellValue(1, 1));
+            Assert.AreEqual("Dead", Ecosystem.GetCellStringValue(1, 1));
         }
         [TestMethod]
         public void TestFewerThanTwoLiveNeighbors()
         {
             Assert.IsTrue(false);
-        } 
+        }
     }
 }
