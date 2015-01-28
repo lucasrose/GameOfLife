@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,70 +9,113 @@ namespace GameOfLife
 {
     public class GameOfLife
     {
-        public static Int32 AliveCell = 1;
+        public static Int32 LivingCell = 1;
         public static Int32 DeadCell = 0;
-        Int32[,] grid;
-        Int32 lengthOfGrid;
-        Int32 heightOfGrid;
-        Int32 counterForCellGrowth;
+        private Int32[,] ecosystem;
+        private Int32 lengthOfecosystem;
+        private Int32 heightOfecosystem;
+        private Int32 midX;
+        private Int32 midY;
 
+        private Stopwatch timer;
 
-        public GameOfLife(Int32 lengthOfGrid, Int32 heightOfGrid)
+        public GameOfLife(Int32 lengthOfecosystem, Int32 heightOfecosystem)
         {
-            grid = new Int32 [lengthOfGrid, heightOfGrid];
-            this.lengthOfGrid = lengthOfGrid;
-            this.heightOfGrid = heightOfGrid;
+            ecosystem = new Int32 [lengthOfecosystem, heightOfecosystem];
+            this.lengthOfecosystem = lengthOfecosystem;
+            this.heightOfecosystem = heightOfecosystem;
+            midX = lengthOfecosystem / 2;
+            midY = heightOfecosystem / 2;
 
-            SetupDeadCells(lengthOfGrid, heightOfGrid);
-            SetupLiveCells(lengthOfGrid, heightOfGrid);
-            counterForCellGrowth = 0;
+            SetupDeadCells();
+            SetupLiveCells();
+            timer = new Stopwatch();
         }
         public void runEcosystem()
         {
-            while (counterForCellGrowth <= 100)
+            timer.Start();
+            while (timer.Elapsed < TimeSpan.FromSeconds(30000))
             {
-                KillCellWithLessThanTwoLiveNeighbors();
-                SaveCellWithTwoOrThreeLiveNeighbors();
-                KillCellWithMoreThanThreeNeighbors();
-                SaveDeadCellWithThreeLiveNeighbors();
-                counterForCellGrowth++;
-                System.Threading.Thread.Sleep(2000);
+                ChangeEcosystem(midX, midY);
             }
-            
-            
+            timer.Stop();
+        }
+        private void ChangeEcosystem(Int32 X, Int32 Y)
+        {
+            SaveOrKillCell(X, Y);
+            if (X < midX + 20)
+                ChangeEcosystem(X + 1, Y);
+            if (X > midX - 20)
+                ChangeEcosystem(X - 1, Y);
+            if (Y < midY + 20)
+                ChangeEcosystem(X, Y + 1);
+            if (Y > midY - 20)
+                ChangeEcosystem(X, Y - 1);            
         }
 
-        private void SetupLiveCells(Int32 lengthOfGrid, Int32 heightOfGrid)
+        private void SetupLiveCells()
         {
-            var midX = lengthOfGrid / 2;
-            var midY = heightOfGrid / 2;
-            grid[midX, midY] = AliveCell;
-            grid[midX, midY - 1] = AliveCell;
-            grid[midX + 1, midY] = AliveCell;
+
+            ecosystem[midX, midY] = LivingCell;
+            ecosystem[midX, midY - 1] = LivingCell;
+            ecosystem[midX + 1, midY] = LivingCell;
         }
 
-        private void SetupDeadCells(Int32 lengthOfGrid, Int32 heightOfGrid)
+        private void SetupDeadCells()
         {
 
-            for (var cellX = 0; cellX < lengthOfGrid; cellX++)
-                for (var cellY = 0; cellY < lengthOfGrid; cellY++)
-                    grid[cellX, cellY] = DeadCell;
+            for (var cellX = 0; cellX < lengthOfecosystem; cellX++)
+                for (var cellY = 0; cellY < lengthOfecosystem; cellY++)
+                    ecosystem[cellX, cellY] = DeadCell;
                
         }
 
         public String GetCellValue(Int32 locationX, Int32 locationY)
         {
-            if (grid[locationX, locationY] == 1)
+            if (ecosystem[locationX, locationY] == 1)
                 return "Alive";
             return "Dead";
         }
 
-        private void KillCellWithLessThanTwoLiveNeighbors()
+        private Int32 GetTheNumberOfCellsAliveAroundCurrentCell(Int32 cellPositionX, Int32 cellPositionY)
         {
-            var locationX = lengthOfGrid / 2;
-            var locationY = heightOfGrid / 2;
-            //counter for cells around it..check 8 cells
-            setDead(locationX, locationY);
+            var count = 0;
+            if (ecosystem[cellPositionX - 1, cellPositionY + 1] == LivingCell)
+                count++;
+            if (ecosystem[cellPositionX - 1, cellPositionY] == LivingCell)
+                count++;
+            if (ecosystem[cellPositionX - 1, cellPositionY - 1] == LivingCell)
+                count++;
+            if (ecosystem[cellPositionX, cellPositionY - 1] == LivingCell)
+                count++;
+            if (ecosystem[cellPositionX + 1, cellPositionY - 1] == LivingCell)
+                count++;
+            if (ecosystem[cellPositionX + 1, cellPositionY] == LivingCell)
+                count++;
+            if (ecosystem[cellPositionX + 1, cellPositionY + 1] == LivingCell)
+                count++;
+            if (ecosystem[cellPositionX, cellPositionY + 1] == LivingCell)
+                count++;
+
+            return count;
+            
+        }
+
+        private void SaveOrKillCell(Int32 X, Int32 Y)
+        {
+            var AliveCells = GetTheNumberOfCellsAliveAroundCurrentCell(X, Y);
+            if (ecosystem[X, Y] == LivingCell)
+            {
+                if (AliveCells < 2)
+                    ecosystem[X, Y] = DeadCell;
+                else if (AliveCells <= 3)
+                    ecosystem[X, Y] = LivingCell;
+                else if (AliveCells > 3)
+                    ecosystem[X, Y] = DeadCell;
+            }
+            else if (ecosystem[X, Y] == DeadCell && AliveCells == 3)
+                ecosystem[X, Y] = LivingCell;
+
         }
 
         private void SaveCellWithTwoOrThreeLiveNeighbors()
@@ -91,12 +135,12 @@ namespace GameOfLife
 
         private void setAlive(Int32 X, Int32 Y)
         {
-            grid[X, Y] = AliveCell;
+            ecosystem[X, Y] = LivingCell;
         }
 
         private void setDead(Int32 X, Int32 Y)
         {
-            grid[X, Y] = DeadCell;
+            ecosystem[X, Y] = DeadCell;
         }
     }
 }
