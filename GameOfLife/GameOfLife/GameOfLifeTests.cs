@@ -40,20 +40,20 @@ namespace GameOfLife
         public void TestExactlyThreeNeighbors()
         {
             Ecosystem.runEcosystem();
-            Assert.AreEqual("Alive", Ecosystem.GetCellStringValue(49, 50));
+            Assert.AreEqual("Alive", Ecosystem.GetCellStringValue(51, 51));
         }
         [TestMethod]
         public void TestMoreThreeNeighbors()
         {
             Ecosystem.runEcosystem();
-            Assert.AreEqual("Dead", Ecosystem.GetCellStringValue(50, 50));
+            Assert.AreEqual("Dead", Ecosystem.GetCellStringValue(55, 55));
         }
 
         [TestMethod]
         public void TestTwoOrThreeNeighbors()
         {
             Ecosystem.runEcosystem();
-            Assert.AreEqual("Dead", Ecosystem.GetCellStringValue(50, 48));
+            Assert.AreEqual("Dead", Ecosystem.GetCellStringValue(52, 50));
         }
     }
 }
