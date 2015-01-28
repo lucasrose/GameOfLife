@@ -17,7 +17,6 @@ namespace GameOfLife
         private Int32 midX;
         private Int32 midY;
 
-        private Stopwatch timer;
 
         public GameOfLife(Int32 lengthOfecosystem, Int32 heightOfecosystem)
         {
@@ -29,36 +28,42 @@ namespace GameOfLife
 
             SetupDeadCells();
             SetupLiveCells();
-            timer = new Stopwatch();
         }
         public void runEcosystem()
         {
-            timer.Start();
-            while (timer.Elapsed < TimeSpan.FromSeconds(30000))
-            {
-                ChangeEcosystem(midX, midY);
-            }
-            timer.Stop();
+            ChangeEcosystemRegular(midX, midY);
         }
-        private void ChangeEcosystem(Int32 X, Int32 Y)
+        private void ChangeEcosystemRecursive(Int32 X, Int32 Y)
         {
             SaveOrKillCell(X, Y);
             if (X < midX + 20)
-                ChangeEcosystem(X + 1, Y);
+                ChangeEcosystemRecursive(X + 1, Y);
             if (X > midX - 20)
-                ChangeEcosystem(X - 1, Y);
+                ChangeEcosystemRecursive(X - 1, Y);
             if (Y < midY + 20)
-                ChangeEcosystem(X, Y + 1);
+                ChangeEcosystemRecursive(X, Y + 1);
             if (Y > midY - 20)
-                ChangeEcosystem(X, Y - 1);
+                ChangeEcosystemRecursive(X, Y - 1);
+        }
+
+        private void ChangeEcosystemRegular(Int32 X, Int32 Y)
+        {
+            for (var cellX = X - 20; cellX < X + 20; cellX++)
+                for (var cellY = Y - 20; cellY < Y + 20; cellY++)
+                    SaveOrKillCell(X, Y);
         }
 
         private void SetupLiveCells()
         {
 
             ecosystem[midX, midY] = LivingCell;
-            ecosystem[midX, midY - 1] = LivingCell;
-            ecosystem[midX + 1, midY] = LivingCell;
+            ecosystem[midX + 1, midY + 1] = LivingCell;
+            ecosystem[midX + 1, midY - 1] = LivingCell;
+            ecosystem[midX - 1, midY - 1] = LivingCell;
+            ecosystem[midX - 1, midY + 1] = LivingCell;
+            ecosystem[midX - 1, midY - 2] = LivingCell;
+
+
         }
 
         private void SetupDeadCells()
@@ -67,7 +72,6 @@ namespace GameOfLife
             for (var cellX = 0; cellX < lengthOfecosystem; cellX++)
                 for (var cellY = 0; cellY < lengthOfecosystem; cellY++)
                     ecosystem[cellX, cellY] = DeadCell;
-
         }
 
         private Int32 GetCellValue(Int32 locationX, Int32 locationY)
@@ -110,7 +114,9 @@ namespace GameOfLife
         private void SaveOrKillCell(Int32 X, Int32 Y)
         {
             var AliveCells = GetTheNumberOfCellsAliveAroundCurrentCell(X, Y);
-            if (ecosystem[X, Y] == LivingCell)
+            if (GetCellValue(X, Y) == DeadCell && AliveCells == 3)
+                setAlive(X, Y);
+            else if (GetCellValue(X, Y) == LivingCell)
             {
                 if (AliveCells < 2)
                     setDead(X, Y);
@@ -119,8 +125,7 @@ namespace GameOfLife
                 else if (AliveCells > 3)
                     setDead(X, Y);
             }
-            else if (ecosystem[X, Y] == DeadCell && AliveCells == 3)
-                setAlive(X, Y);
+
         }
 
         private void setAlive(Int32 X, Int32 Y)

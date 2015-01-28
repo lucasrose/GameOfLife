@@ -32,7 +32,28 @@ namespace GameOfLife
         [TestMethod]
         public void TestFewerThanTwoLiveNeighbors()
         {
-            Assert.IsTrue(false);
+            Ecosystem.runEcosystem();
+            Assert.AreEqual("Dead", Ecosystem.GetCellStringValue(52, 51));
+        }
+
+        [TestMethod]
+        public void TestExactlyThreeNeighbors()
+        {
+            Ecosystem.runEcosystem();
+            Assert.AreEqual("Alive", Ecosystem.GetCellStringValue(49, 50));
+        }
+        [TestMethod]
+        public void TestMoreThreeNeighbors()
+        {
+            Ecosystem.runEcosystem();
+            Assert.AreEqual("Dead", Ecosystem.GetCellStringValue(50, 50));
+        }
+
+        [TestMethod]
+        public void TestTwoOrThreeNeighbors()
+        {
+            Ecosystem.runEcosystem();
+            Assert.AreEqual("Dead", Ecosystem.GetCellStringValue(50, 48));
         }
     }
 }
